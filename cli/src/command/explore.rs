@@ -30,7 +30,7 @@ pub fn run_explore(path: PathBuf, slots: Option<Vec<usize>>, output: PathBuf, wi
                     "{} {} : {}",
                     warn("Could not explore slot"),
                     data1(id),
-                    err(e.description())),
+                    err(&e.to_string())),
                 _ => (),
             }
         }

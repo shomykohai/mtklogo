@@ -36,10 +36,10 @@ impl LogoTable {
         let logo_count: u32 = reader.read_u32::<LittleEndian>()?;
         // and the block size
         let block_size: u32 = reader.read_u32::<LittleEndian>()?;
-        if block_size != header.size {
+        if block_size > header.size {
             return Err(IOError::new(ErrorKind::InvalidData,
                                     format!(
-                                        "MTK Header size '{:0x}' does not match bloc size '{:0x}'", header.size, block_size)));
+                                        "MTK Header size '{:0x}' is smaller than block size '{:0x}'", header.size, block_size)));
         }
         let mut offsets: Vec<u32> = Vec::with_capacity(logo_count as usize);
         for _ in 0..(logo_count as usize) {

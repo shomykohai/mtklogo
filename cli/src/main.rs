@@ -24,7 +24,7 @@ fn main() {
     match wrapped_main() {
         Ok(()) => (),
         Err(e) => {
-            println!("{}: {}", warn("error"), err(e.description()));
+            println!("{}: {}", warn("error"), err(&e.to_string()));
             std::process::exit(1);
         }
     }

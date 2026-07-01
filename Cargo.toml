@@ -42,3 +42,14 @@ optional = true
 
 [dev-dependencies]
 lazy_static ="1.2.0"
+
+[workspace]
+members = [
+    "cli",
+]
+
+[profile.release]
+# tries reducing the binary size.
+# consider stripping the symbols after compilation.
+lto = true
+panic = 'abort'

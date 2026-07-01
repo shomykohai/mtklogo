@@ -111,7 +111,7 @@ impl Config {
         config.map_err(
             |e| IOError::new(ErrorKind::InvalidData,
                              format!(
-                                 "could not read config {} -> '{}'", path.display(), e.description())))
+                                 "could not read config {} -> '{}'", path.display(), e)))
     }
 
     pub fn from_file(path: &Path) -> Result<Config> {

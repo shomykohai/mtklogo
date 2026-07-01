@@ -27,9 +27,3 @@ ansi_term = "0.11.0"
 serde = "1.0.84"
 serde_derive = "1.0.84"
 serde_yaml = "0.7"
-
-[profile.release]
-# tries reducing the binary size.
-# consider stripping the symbols after compilation.
-lto = true
-panic = 'abort'

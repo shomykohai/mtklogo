@@ -85,7 +85,7 @@ fn extract_logo<F>(id: usize, blob: &Vec<u8>, zip: bool, color_mode: &ColorMode,
                     println!("{} slot {} as {} because {}. Falling back to raw .z.",
                              warn("Could not export"),
                              data1(id), emphasize1(e),
-                             err(er.description()), );
+                             err(&er.to_string()), );
                     // invalidates names.
                     let info = FileInfo::from_info(id, true, color_mode);
                     // computes the output name.
@@ -115,7 +115,7 @@ fn check_logo<F>(id: usize, blob: &Vec<u8>, zip: bool, color_mode: &ColorMode, o
                 });
             if let Some(er) = exported.err() {
                 println!("{} slot {} ({} bytes) as an image : {}",
-                         warn("Cannot export"), id, blob.len(), warn(er.description()));
+                         warn("Cannot export"), id, blob.len(), warn(&er.to_string()));
             }
         }
     };
