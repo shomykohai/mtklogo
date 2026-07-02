@@ -35,10 +35,11 @@ png = "0.18.1"
 version = "2.3.0"
 optional = true
 
-# zlib with 'miniz-sys' as a default backend.
+# zlib with the system libz backend (better ratios than the default miniz).
 [dependencies.flate2]
 version = "1.1.9"
 optional = true
+features = ["zlib"]
 
 [workspace]
 members = [
