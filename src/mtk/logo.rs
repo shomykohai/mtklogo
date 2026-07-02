@@ -1,6 +1,6 @@
+use super::header::{MtkHeader, MtkType};
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use std::io::{Error as IOError, ErrorKind, Read, Result, Seek, SeekFrom, Write};
-use super::header::{MtkHeader, MtkType};
 
 /// The raw logo binary's header, we only keep "relevant" information.
 /// Data like padding or non-meaningful bytes are not preserved.
@@ -29,23 +29,37 @@ impl LogoTable {
         let header = MtkHeader::read(&mut reader)?;
         // It must be a logo!
         match header.mtk_type {
-            MtkType::LOGO => (),
-            _ => return Err(IOError::new(ErrorKind::InvalidData, "MTK image is not a logo")),
+            MtkType::Logo => (),
+            _ => {
+                return Err(IOError::new(
+                    ErrorKind::InvalidData,
+                    "MTK image is not a logo",
+                ));
+            }
         };
         // now we have the number of image
         let logo_count: u32 = reader.read_u32::<LittleEndian>()?;
         // and the block size
         let block_size: u32 = reader.read_u32::<LittleEndian>()?;
         if block_size > header.size {
-            return Err(IOError::new(ErrorKind::InvalidData,
-                                    format!(
-                                        "MTK Header size '{:0x}' is smaller than block size '{:0x}'", header.size, block_size)));
+            return Err(IOError::new(
+                ErrorKind::InvalidData,
+                format!(
+                    "MTK Header size '{:0x}' is smaller than block size '{:0x}'",
+                    header.size, block_size
+                ),
+            ));
         }
         let mut offsets: Vec<u32> = Vec::with_capacity(logo_count as usize);
         for _ in 0..(logo_count as usize) {
             offsets.push(reader.read_u32::<LittleEndian>()?);
         }
-        Ok(LogoTable { header, logo_count, block_size, offsets })
+        Ok(LogoTable {
+            header,
+            logo_count,
+            block_size,
+            offsets,
+        })
     }
 
     /// Writes the logo table (the table only, not the logos).
@@ -75,7 +89,11 @@ impl LogoTable {
         let offsets = &self.offsets;
         let logo_count = self.logo_count as usize;
         let offset = offsets[i];
-        let next_offset = if i < logo_count - 1 { offsets[i + 1] } else { self.block_size };
+        let next_offset = if i < logo_count - 1 {
+            offsets[i + 1]
+        } else {
+            self.block_size
+        };
         let size = next_offset - offset;
         // We must inflate the image to guess its dimensions.
         reader.seek(SeekFrom::Start(offset as u64 + MtkHeader::SIZE as u64))?;
@@ -106,7 +124,10 @@ impl LogoImage {
             offset += blob.len() as u32;
         }
         let block_size = offset;
-        let header = MtkHeader { size: block_size, mtk_type: MtkType::LOGO };
+        let header = MtkHeader {
+            size: block_size,
+            mtk_type: MtkType::Logo,
+        };
         let table = LogoTable {
             header,
             logo_count: blobs.len() as u32,

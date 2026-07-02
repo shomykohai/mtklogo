@@ -1,9 +1,9 @@
+use super::{cmd, data1, data2, data3, emphasize1};
+use mtklogo::ColorMode;
 use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Display;
 use std::io::Result;
-use super::{cmd, emphasize1, data1, data2, data3};
-use super::mtklogo::ColorMode;
 
 #[derive(Clone)]
 struct Factor {
@@ -14,7 +14,11 @@ struct Factor {
 
 impl Factor {
     fn power_zero(factor: usize) -> Factor {
-        Factor { factor, power: 0, val: 1 }
+        Factor {
+            factor,
+            power: 0,
+            val: 1,
+        }
     }
     #[inline(always)]
     fn value(&self) -> usize {
@@ -29,8 +33,12 @@ impl Factor {
         let mut subfactors = Vec::with_capacity(self.power);
         let mut val: usize = 1;
         for power in 1..(self.power + 1) {
-            val = val * self.factor;
-            subfactors.push(Factor { factor: self.factor, power, val });
+            val *= self.factor;
+            subfactors.push(Factor {
+                factor: self.factor,
+                power,
+                val,
+            });
         }
         subfactors
     }
@@ -43,7 +51,7 @@ impl Factor {
         // let's start attempting a division by 2.
         let mut f = Factor::power_zero(2);
         while f.factor <= remainder {
-            if remainder % f.factor == 0 {
+            if remainder.is_multiple_of(f.factor) {
                 remainder /= f.factor;
                 f.higher_mut();
             } else {
@@ -67,7 +75,7 @@ impl Factor {
 }
 
 struct Factors<'a> {
-    factors: &'a Vec<Factor>
+    factors: &'a Vec<Factor>,
 }
 
 impl<'a> Display for Factors<'a> {
@@ -87,20 +95,21 @@ impl Display for Factor {
         match self.power {
             0 => fmt.write_fmt(format_args!("{}", data1(1))),
             1 => fmt.write_fmt(format_args!("{}", data1(self.factor))),
-            _ => fmt.write_fmt(format_args!("{}^{}", data1(self.factor), data1(self.power)))
+            _ => fmt.write_fmt(format_args!("{}^{}", data1(self.factor), data1(self.power))),
         }
     }
 }
 
-
 pub fn run_guess(size: usize) -> Result<()> {
-    println!("{} possible dimensions of a {} bytes blob",
-             cmd("guess"),
-             data1(size));
-    fn explore(available_factors: &Vec<Factor>, a_factors: Vec<Factor>, n: usize) {
+    println!(
+        "{} possible dimensions of a {} bytes blob",
+        cmd("guess"),
+        data1(size)
+    );
+    fn explore(available_factors: &[Factor], a_factors: Vec<Factor>, n: usize) {
         let sz = available_factors.len();
         // Takes a factor in the available factor bag.
-        let mut next_available = available_factors.clone();
+        let mut next_available = available_factors.to_vec();
         for _ in 0..sz {
             let current_factors = next_available.remove(0);
             for pow in current_factors.divisors() {
@@ -112,12 +121,17 @@ pub fn run_guess(size: usize) -> Result<()> {
                     prod *= x.value();
                     prod
                 };
-                let www = next_a.iter().fold(1 as usize, product);
+                let www = next_a.iter().fold(1_usize, product);
                 // This is the second member of the solution.
                 let hhh = n / www;
-                println!("It could be {} x {}. Because {} = ({}) * {}.",
-                         data3(www), data3(hhh),
-                         data2(n), Factors { factors: &next_a }, data1(hhh));
+                println!(
+                    "It could be {} x {}. Because {} = ({}) * {}.",
+                    data3(www),
+                    data3(hhh),
+                    data2(n),
+                    Factors { factors: &next_a },
+                    data1(hhh)
+                );
                 // continues
                 explore(&next_available, next_a, n);
             }
@@ -127,16 +141,23 @@ pub fn run_guess(size: usize) -> Result<()> {
     // group color modes by bytes per pixels.
     let mut table: HashMap<u32, Vec<&ColorMode>> = HashMap::new();
     // Cowboy style, just for the pleasure to do it one line !
-    ColorMode::enumerate().iter().for_each(
-        |mode| table.entry(mode.bytes_per_pixel()).or_insert_with(|| Vec::new()).push(mode));
+    ColorMode::enumerate()
+        .iter()
+        .for_each(|mode| table.entry(mode.bytes_per_pixel()).or_default().push(mode));
     // Guess dimensions for each bytes per pixel.
     for (bpp, modes) in table.iter() {
         let sz = size / (*bpp as usize);
         let factors = Factor::decompose(sz);
-        let o:Vec<String> = modes.iter().map(|m| format!("{}", emphasize1(m))).collect();
+        let o: Vec<String> = modes.iter().map(|m| format!("{}", emphasize1(m))).collect();
         let colored_list = o.join(",");
-        println!("if {} bytes per pixel (modes: {}), {} bytes is {} pixels and has following divisors: {}.",
-                 data1(*bpp), colored_list, data3(size), data2(sz), Factors { factors: &factors });
+        println!(
+            "if {} bytes per pixel (modes: {}), {} bytes is {} pixels and has following divisors: {}.",
+            data1(*bpp),
+            colored_list,
+            data3(size),
+            data2(sz),
+            Factors { factors: &factors }
+        );
         // explores possible arrangements
         explore(&factors, Vec::new(), sz);
     }

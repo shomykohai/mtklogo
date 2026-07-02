@@ -4,28 +4,25 @@
 name = "mtklogo-cli"
 version = "0.1.2"
 authors = ["arlept <arnaud@lepoint.net>"]
+edition = "2024"
 # see https://spdx.org/licenses/
 license = "MIT OR Apache-2.0"
 description = "A Rust library and CLIT tool for parsing MTK logo images."
 repository = "https://github.com/cyberknight777/mtklogo"
-keywords= ["Android","MTK","Logo"]
+keywords = ["Android", "MTK", "Logo"]
 categories = ["command-line-utilities"]
 readme = "README.md"
-
-[badges]
-maintenance = { status = "as-is" }
 
 [[bin]]
 name = "mtklogo"
 path = "src/main.rs"
 
 [dependencies]
-mtklogo = {version = "0.1.2", path = "../"}
+mtklogo = { version = "0.1.2", path = "../" }
 # command line parsing
-clap = "2.32.0"
+clap = { version = "4.6.1", features = ["cargo"] }
 # colored output
-ansi_term = "0.11.0"
+colored = "3.1.1"
 # configuration file parsing
-serde = "1.0.84"
-serde_derive = "1.0.84"
-serde_yaml = "0.7"
+serde = { version = "1.0.228", features = ["derive"] }
+serde-saphyr = "0.0.28"
