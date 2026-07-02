@@ -7,6 +7,7 @@ use std::io::{Error as IOError, ErrorKind, Read, Result, Write};
 pub struct MtkHeader {
     pub size: u32,
     pub mtk_type: MtkType,
+    pub legacy_logo: bool, // true = "LOGO", false = "logo"
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -50,12 +51,17 @@ impl MtkHeader {
         let size = reader.read_u32::<LittleEndian>()?;
         let mut typ = [0u8; 32];
         reader.read_exact(&mut typ)?;
+        let legacy_logo = typ.starts_with(b"LOGO");
         let mtk_type = MtkType::from_bytes(&typ)
             .ok_or_else(|| IOError::new(ErrorKind::InvalidData, "Missing MTK Header type."))?;
 
         let mut remainder = [0u8; 472];
         reader.read_exact(&mut remainder)?;
-        Ok(MtkHeader { size, mtk_type })
+        Ok(MtkHeader {
+            size,
+            mtk_type,
+            legacy_logo,
+        })
     }
 
     /// Writes this header to the specified writer.
@@ -63,11 +69,12 @@ impl MtkHeader {
         writer.write_u32::<BigEndian>(Self::MAGIC)?;
         writer.write_u32::<LittleEndian>(self.size)?;
         let mut imagetype = [0u8; 32];
-        let label = match self.mtk_type {
-            MtkType::Logo => "LOGO",
-            MtkType::Recovery => "RECOVERY",
-            MtkType::Kernel => "KERNEL",
-            MtkType::Rootfs => "ROOTFS",
+        let label = match (self.mtk_type, self.legacy_logo) {
+            (MtkType::Logo, true) => "LOGO",
+            (MtkType::Logo, false) => "logo",
+            (MtkType::Recovery, _) => "RECOVERY",
+            (MtkType::Kernel, _) => "KERNEL",
+            (MtkType::Rootfs, _) => "ROOTFS",
         };
         imagetype[..label.len()].copy_from_slice(label.as_bytes());
         writer.write_all(&imagetype)?;

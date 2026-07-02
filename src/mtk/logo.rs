@@ -171,6 +171,7 @@ impl LogoImage {
         let header = MtkHeader {
             size: block_size,
             mtk_type: MtkType::Logo,
+            legacy_logo: false, // new format is the default.
         };
         let table = LogoTable {
             header,
