@@ -47,7 +47,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.2"
+version = "1.0.0"
 
 [profile.release]
 codegen-units = 1
