@@ -41,8 +41,8 @@
 
           meta = with pkgs.lib; {
             description = "A Rust library and CLI for parsing MTK logo images";
-            homepage = "https://github.com/arlept/mtkimgrs";
-            license = with licenses; [ mit asl20 ];
+            homepage = "https://github.com/cyberknight777/mtklogo";
+            license = licenses.asl20;
           };
         };
       });
