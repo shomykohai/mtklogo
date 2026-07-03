@@ -37,9 +37,8 @@ fn build_cli() -> Command {
         .index(1)
         .value_parser(clap::builder::ValueParser::new(is_existing_file));
 
-    Command::new("mtklogo")
-        .version("0.1.2")
-        .author("arlept, arnaud@lepoint.net")
+    Command::new(clap::crate_name!().trim_end_matches("-cli"))
+        .version(clap::crate_version!())
         .about("Yet another Android Logo Customizer for MTK devices!\nIt packs or repacks images from an MTK `logo.bin` file.")
         .subcommand(Command::new("unpack")
             .about("Unpacks a logo image")
