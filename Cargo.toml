@@ -3,7 +3,7 @@
 [package]
 name = "mtklogo"
 version.workspace = true
-authors = ["arlept <arnaud@lepoint.net>"]
+authors = ["arlept <arnaud@lepoint.net>", "Cyber Knight <cyberknight755@gmail.com>"]
 edition = "2024"
 # see https://spdx.org/licenses/
 license = "MIT OR Apache-2.0"
