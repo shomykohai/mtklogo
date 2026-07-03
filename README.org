@@ -27,6 +27,11 @@ This program allows one to:
 - =repack= the images into a flashable logo.bin and
 - =unpack= the logo image to extract the images in it
 
+#+BEGIN_QUOTE
+[!CAUTION]
+Modifying the stock logo image may break your device! Do backups before proceeding. I will not be held responsible for any damage caused to your device, use this tool at your own risk.
+#+END_QUOTE
+
 * Usage
 
 First download the mtklogo binary relevant to the OS and/or platform you are on (Supported platforms are Linux x64, Windows and Android ARM64) and the mtklogo.yaml from [[https://github.com/cyberknight777/mtklogo/releases/][here]].
